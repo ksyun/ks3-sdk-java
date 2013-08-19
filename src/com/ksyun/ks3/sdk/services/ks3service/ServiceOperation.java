@@ -22,8 +22,9 @@ public class ServiceOperation extends KS3Operation {
 		
 	public List<Bucket> getBucketList() throws Exception{
 		
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
 		Request request = requestBuilder.setMethod(HttpMethod.GET).build();
-		Response response = sendMessage(request);
+		Response response = sendMessageAndKeepAlive(request);
 		return resultParse.getBucketList(response.getBody());
 	}	
 }

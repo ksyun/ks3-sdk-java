@@ -4,21 +4,15 @@
  */
 package com.ksyun.ks3.sdk.services.ks3service;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 
 import com.ksyun.ks3.sdk.dto.Credential;
 import com.ksyun.ks3.sdk.dto.internal.Request;
-import com.ksyun.ks3.sdk.dto.internal.Response;
-import com.ksyun.ks3.sdk.services.httpservice.HttpRequestor;
 import com.ksyun.ks3.sdk.services.ks3service.RequestBuilder;
 import com.ksyun.ks3.sdk.tools.CodeUtils;
-import com.ksyun.ks3.sdk.tools.IOUtils;
 
 
 public class RequestBuilder {
@@ -127,6 +121,5 @@ public class RequestBuilder {
 		clear();
 
 		return request;
-	}
-
+	}	
 }

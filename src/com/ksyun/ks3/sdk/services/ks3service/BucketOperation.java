@@ -25,30 +25,35 @@ public class BucketOperation extends KS3Operation {
 	}
 
 	public void createBucket(String bucketName) throws Exception {
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
 		Request request = requestBuilder.setMethod(HttpMethod.PUT).setBucket(bucketName).build();
 		sendMessage(request);
 	}
 
 	public void deleteBucket(String bucketName) throws Exception {
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
 		Request request = requestBuilder.setMethod(HttpMethod.DELETE).setBucket(bucketName).build();
 		sendMessage(request);
 	}
 
 	public AccessControlPolicy getBucketACL(String bucketName) throws Exception {
 
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
 		Request request = requestBuilder.setMethod(HttpMethod.GET).setBucket(bucketName).setAclFlag(true).build();
-		Response response = sendMessage(request);
+		Response response = sendMessageAndKeepAlive(request);		
 		return resultParse.getAccessControlPolicy(response.getBody());
 	}
 
 	public void setBucketACL(String bucketName, AccessControlList acl) throws Exception {
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
 		Request request = requestBuilder.setMethod(HttpMethod.PUT).setBucket(bucketName).addHeader("x-kss-acl",acl.toString()).build();		
 		sendMessage(request);
 	}
 	
 	public ObjectList getObjectList(String bucketName) throws Exception{
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
 		Request request = requestBuilder.setMethod(HttpMethod.GET).setBucket(bucketName).build();
-		Response response = sendMessage(request);
+		Response response = sendMessageAndKeepAlive(request);	
 		return resultParse.getObjectList(response.getBody());
 	}
 	
@@ -60,6 +65,8 @@ public class BucketOperation extends KS3Operation {
 		Integer maxKeys = options.getMaxKeys();
 		char delimiter = options.getDelimiter();
 		
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
+		
 		requestBuilder = requestBuilder.setMethod(HttpMethod.GET).setBucket(bucketName);
 		requestBuilder = prefix == null ? requestBuilder:requestBuilder.addParam("prefix", prefix);
 		requestBuilder = marker == null ? requestBuilder:requestBuilder.addParam("marker", marker);
@@ -67,7 +74,7 @@ public class BucketOperation extends KS3Operation {
 		requestBuilder = delimiter == 0 ? requestBuilder:requestBuilder.addParam("delimiter", String.valueOf(delimiter));
 		
 		Request request = requestBuilder.build();
-		Response response = sendMessage(request);
+		Response response = sendMessageAndKeepAlive(request);
 		
 		return resultParse.getObjectList(response.getBody());
 	}
