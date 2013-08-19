@@ -5,11 +5,9 @@
 package com.ksyun.ks3.sdk.services.ks3service;
 
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,6 +40,7 @@ public class ObjectOperation extends KS3Operation {
 		if(mimeType==null||mimeType.trim().equals(""))
 			mimeType = "application/octet-stream";		
 
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
 		Request request = requestBuilder.setMethod(HttpMethod.PUT)
 				.setBucket(bucketName).setObjectKey(objectKey).setObjectValue(new FileInputStream(file))
 				.addHeader("content-type", mimeType)
@@ -54,8 +53,9 @@ public class ObjectOperation extends KS3Operation {
 		return new ObjectEtag(eTag);
 	}
 	
-	public ObjectEtag putStringObject(String bucketName, String objectKey,String content) throws Exception{		
+	public ObjectEtag putStringObject(String bucketName, String objectKey,String content) throws Exception{	
 		
+		RequestBuilder requestBuilder = requestFactory.getBuilder();		
 		Request request = requestBuilder.setMethod(HttpMethod.PUT)
 				.setBucket(bucketName).setObjectKey(objectKey).setObjectValue(new ByteArrayInputStream(content.getBytes()))
 				.addHeader("content-type", "text/plain; charset=UTF-8")
@@ -71,8 +71,9 @@ public class ObjectOperation extends KS3Operation {
 	
 	public ObjectEntity getObject(String bucketName, String objectKey) throws Exception{
 		
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
 		Request request = requestBuilder.setMethod(HttpMethod.GET).setBucket(bucketName).setObjectKey(objectKey).build();
-		Response response = sendMessage(request);
+		Response response = sendMessageAndKeepAlive(request);
 		
 		return new ObjectEntity(bucketName, objectKey, response.getBody());
 	}
@@ -82,6 +83,7 @@ public class ObjectOperation extends KS3Operation {
 		String bucketName = options.getBucketName();
 		String objectKey = options.getObjectKey();
 		
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
 		requestBuilder.setMethod("GET").setBucket(bucketName).setObjectKey(objectKey);
 		if(options.getRange()!=null){
 			requestBuilder = requestBuilder.addHeader("Range", "bytes="+options.getRange()[0]+"-"+options.getRange()[1]);
@@ -104,13 +106,14 @@ public class ObjectOperation extends KS3Operation {
 		}
 		
 		Request request = requestBuilder.build();
-		Response response = sendMessage(request);
+		Response response = sendMessageAndKeepAlive(request);
 		
 		return new ObjectEntity(bucketName, objectKey, response.getBody());
 	}
 	
 	public void deleteObject(String bucketName, String objectKey) throws Exception{
 		
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
 		Request request = requestBuilder.setMethod(HttpMethod.DELETE).setBucket(bucketName).setObjectKey(objectKey).build();
 		sendMessage(request);		
 	}
@@ -123,6 +126,7 @@ public class ObjectOperation extends KS3Operation {
 		HashMap<String, String> paramsHeaders = options.getResponseHeaders();
 		
 		String expTime = String.valueOf(new Date().getTime()/1000+expires);
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
 		requestBuilder = requestBuilder.setMethod("GET").setBucket(bucketName).setObjectKey(objectKey).addHeader("Date",expTime);
 		
 		for(Entry<String, String> entry:paramsHeaders.entrySet())

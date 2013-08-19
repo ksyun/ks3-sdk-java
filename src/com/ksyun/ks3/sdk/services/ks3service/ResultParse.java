@@ -36,7 +36,6 @@ public class ResultParse {
 		sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
 		sdf.setTimeZone(new SimpleTimeZone(0, "GMT"));
 	}
-
 	
 	private Element getRootElement(InputStream is) throws Exception{
 		
@@ -48,6 +47,10 @@ public class ResultParse {
 			
 			throw new Exception("respones builder error");
 		}
+		finally{
+			IOUtils.safelyCloseInputStream(is);
+		}
+		
 		return doc.getDocumentElement();
 	}
 	
