@@ -24,6 +24,7 @@ import com.ksyun.ks3.sdk.tools.EncodingUtils;
 public class Signature {
 	
 	private static Set<String> responseHeaders = new HashSet<String>();
+	private static Set<String> singleParameter = new HashSet<String>();
 	
 	static {		
 		responseHeaders.add("response-content-type");
@@ -31,7 +32,10 @@ public class Signature {
 		responseHeaders.add("response-expires");
 		responseHeaders.add("response-cache-control");
 		responseHeaders.add("response-content-disposition");
-		responseHeaders.add("response-content-encoding");	
+		responseHeaders.add("response-content-encoding");
+		
+		singleParameter.add("acl");
+		singleParameter.add("uploads");
 	}
 	
 	private static String base64encoding(byte[] b){		
@@ -106,29 +110,34 @@ public class Signature {
 				resUrl=resUrl+object;
 		}	
 		
-		if(request.getUrl().endsWith("?acl"))
-			resUrl+="?acl";
+//		if(request.getUrl().endsWith("?acl"))
+//			resUrl+="?acl";
 		
 		Map<String, String> params = request.getParams();
 		Map<String, String> interestedParams = new TreeMap<String, String>();
 		if(params!=null&&params.size()>0){
 			for(Entry<String,String> entry:params.entrySet()){
 				String lowerKey=entry.getKey().toLowerCase();
-				if(responseHeaders.contains(lowerKey))
+				if(responseHeaders.contains(lowerKey)||singleParameter.contains(lowerKey))
 					interestedParams.put(lowerKey, entry.getValue());	
 			}
 			
 			String paramsStr = "";
 			for(Entry<String, String> entry :interestedParams.entrySet()){
-				paramsStr+=entry.getKey()+"="+entry.getValue()+"&";
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key!=null&&!key.trim().equals("")){
+					if(value==null)
+						paramsStr+=key+"&";
+					else
+						paramsStr+=key+"="+value+"&";
+				}				
 			}
 			
 			if(paramsStr.length()>0){
 				paramsStr=paramsStr.substring(0, paramsStr.length()-1);
-				resUrl+="?"+paramsStr;				
-			}
-			
-			
+				resUrl+="?"+paramsStr;	
+			}			
 		}
 		
 		list.add(resUrl);
@@ -138,6 +147,8 @@ public class Signature {
 			strToSign+=item+"\n";
 		}
 		strToSign=strToSign.substring(0, strToSign.length()-1);
+		
+//		System.out.println(strToSign);
 			
 		String signedStr = sign(request.getCredential().getAccessKeySecret(),strToSign);
 		return signedStr;

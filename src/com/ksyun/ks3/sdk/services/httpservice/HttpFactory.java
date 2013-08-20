@@ -18,6 +18,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.params.ClientPNames;
@@ -68,29 +69,36 @@ public class HttpFactory {
 		String bucket = request.getBucekt();
 		if (bucket != null && bucket.trim().length() != 0)
 			url = bucket + "." + url;
-			// url=url+"/"+bucket;
 		
 
 		String object = request.getObject();
 		if (object != null && object.trim().length() != 0){
-			
-//			try {
-//				url = url + "/" + URLEncoder.encode(object,"UTF-8");//				
-//			} catch (UnsupportedEncodingException e) {
-//			};
-			url = url + "/" + EncodingUtils.getUrlEncode(object);
-		}
-			
+			url = url + "/" + EncodingUtils.getUrlEncode(object);			
+		}			
 
 		url  = "http://"+ url;
 
 		Map<String, String> params = request.getParams();
 		if (params != null && params.size() > 0) {
+			
 			url += "?";
-			for (Entry<String, String> entry : params.entrySet()) {
-				String kv = entry.getKey() + "=" + entry.getValue() + "&";
-				url += kv;
+			
+			for(Entry<String, String> entry :params.entrySet()){
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key!=null&&!key.trim().equals("")){
+					if(value==null)
+						url+=key+"&";
+					else
+						url+=key+"="+value+"&";
+				}				
 			}
+			
+			
+//			for (Entry<String, String> entry : params.entrySet()) {
+//				String kv = entry.getKey() + "=" + entry.getValue() + "&";
+//				url += kv;
+//			}
 			url = url.substring(0, url.length() - 1);
 		}
 		
@@ -102,6 +110,8 @@ public class HttpFactory {
 			httpRequestBase = new HttpDelete(url);
 		else if (method.equals(HttpMethod.HEAD))
 			httpRequestBase = new HttpHead(url);
+		else if(method.equals(HttpMethod.POST))
+			httpRequestBase = new HttpPost(url);		
 		else if (method.equals(HttpMethod.PUT)) {
 			HttpPut putMethod = new HttpPut(url);
 			if (content != null) {			
@@ -109,7 +119,8 @@ public class HttpFactory {
 				putMethod.setEntity(entity);
 			}
 			httpRequestBase = putMethod;
-		} else
+		} 
+		else
 			throw new IllegalArgumentException("Unsupported HTTP method:"
 					+ request.getMethod());
 		
