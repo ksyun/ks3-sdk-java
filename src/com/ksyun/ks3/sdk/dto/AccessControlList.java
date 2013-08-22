@@ -14,6 +14,8 @@ import com.ksyun.ks3.sdk.tools.JsonUtils;
  */
 public final class AccessControlList implements Serializable{	
 	
+	
+	private static final long serialVersionUID = -3659262771000245871L;
 	/**
 	 * That means only you have access to the bucket.
 	 */
@@ -41,11 +43,12 @@ public final class AccessControlList implements Serializable{
 	}
 	
 	/**
-	 * Get Json of the instance.
+	 * Get JSon of the instance.
 	 */
 	public String toJson(){
 		return JsonUtils.getJson(this);		
-	}
+	}	
+	
 
 	static {
 		PRIVATE = new AccessControlList("private");

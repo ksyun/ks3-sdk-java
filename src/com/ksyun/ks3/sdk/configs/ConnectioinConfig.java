@@ -10,5 +10,6 @@ public class ConnectioinConfig {
 	public static final Integer maxConnections = 50;
 	public static final Integer socketTimeout = 50000;
 	public static final Integer connectionTimeout = 50000;
+	public static final Integer maxRetryCount = 3;
 
 }

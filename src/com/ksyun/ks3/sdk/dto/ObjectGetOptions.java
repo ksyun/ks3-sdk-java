@@ -20,6 +20,7 @@ import com.ksyun.ks3.sdk.tools.JsonUtils;
  */
 public class ObjectGetOptions implements Serializable{
 	
+	private static final long serialVersionUID = 591590580620033028L;
 	private String bucketName;
 	private String objectKey;
 	private long range[];
@@ -216,10 +217,17 @@ public class ObjectGetOptions implements Serializable{
 	}
 	
 	/**
-	 * Get Json of the instance.
+	 * Get JSon of the instance.
 	 */
 	public String toJson(){
 		return JsonUtils.getJson(this);		
+	}
+	
+	/**
+	 * Get String of the instance.
+	 */
+	public String toString(){
+		return this.toJson();
 	}
 	
 	private String data2String(Date date){

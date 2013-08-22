@@ -13,6 +13,7 @@ import com.ksyun.ks3.sdk.tools.JsonUtils;
  */
 public class ObjectEtag implements Serializable{
 	
+	private static final long serialVersionUID = 5148234442747150732L;
 	private String eTagValue;
 	
 	/**
@@ -47,7 +48,7 @@ public class ObjectEtag implements Serializable{
 	}
 	
 	/**
-	 * Set the eTag vlaue.
+	 * Set the eTag value.
 	 * @param eTagValue The eTag value.
 	 */
 	public void seteTagValue(String eTagValue) {
@@ -55,7 +56,7 @@ public class ObjectEtag implements Serializable{
 	}
 	
 	/**
-	 * Get Json of the instance.
+	 * Get JSon of the instance.
 	 */
 	public String toJson(){
 		return JsonUtils.getJson(this);		

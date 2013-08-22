@@ -17,6 +17,8 @@ import com.ksyun.ks3.sdk.tools.JsonUtils;
  */
 public class PresignedUrlOptions implements Serializable{
 	
+
+	private static final long serialVersionUID = 8103463136697169852L;
 	private String bucketName;
 	private String objectKey;
 	private Integer expires;
@@ -114,10 +116,17 @@ public class PresignedUrlOptions implements Serializable{
 	}	
 	
 	/**
-	 * Get Json of the instance.
+	 * Get JSon of the instance.
 	 */
 	public String toJson(){
 		return JsonUtils.getJson(this);		
+	}
+	
+	/**
+	 * Get String of the instance.
+	 */
+	public String toString(){
+		return this.toJson();
 	}
 	
 	private void initHeaderSet(){
