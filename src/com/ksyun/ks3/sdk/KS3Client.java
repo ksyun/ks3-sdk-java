@@ -5,18 +5,27 @@
 package com.ksyun.ks3.sdk;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
+import com.ksyun.ks3.sdk.dto.AbortMultipartUploadOptions;
 import com.ksyun.ks3.sdk.dto.AccessControlList;
 import com.ksyun.ks3.sdk.dto.AccessControlPolicy;
 import com.ksyun.ks3.sdk.dto.Bucket;
+import com.ksyun.ks3.sdk.dto.CompleteMultipartUploadOptions;
+import com.ksyun.ks3.sdk.dto.CompleteMultipartUploadResult;
 import com.ksyun.ks3.sdk.dto.Credential;
+import com.ksyun.ks3.sdk.dto.InitiateMultipartUploadResult;
 import com.ksyun.ks3.sdk.dto.ObjectEntity;
 import com.ksyun.ks3.sdk.dto.ObjectEtag;
 import com.ksyun.ks3.sdk.dto.ObjectGetOptions;
 import com.ksyun.ks3.sdk.dto.ObjectList;
 import com.ksyun.ks3.sdk.dto.ObjectListOptions;
+import com.ksyun.ks3.sdk.dto.PartList;
+import com.ksyun.ks3.sdk.dto.PartListOptions;
 import com.ksyun.ks3.sdk.dto.PresignedUrlOptions;
+import com.ksyun.ks3.sdk.dto.UploadPartOptions;
+import com.ksyun.ks3.sdk.dto.UploadPartResult;
 import com.ksyun.ks3.sdk.services.httpservice.HttpRequestor;
 import com.ksyun.ks3.sdk.services.ks3service.BucketOperation;
 import com.ksyun.ks3.sdk.services.ks3service.ObjectOperation;
@@ -124,6 +133,22 @@ public class KS3Client {
 	}
 	
 	/**
+	 * Upload data by input stream.
+	 * @param bucketName Bucket name.
+	 * @param objectKey The key of a object.
+	 * @param inputStream The input stream of the data.
+	 * @param offset The offset of the input stream.
+	 * @param length The length of the input stream.
+	 * @param mimeType Mime type according to the type of the file.
+	 * @return The eTag of the object.
+	 * @throws Exception
+	 */
+	public ObjectEtag putObjectByInputStream(String bucketName, String objectKey, InputStream inputStream, 
+			int offset, int length, String mimeType) throws Exception{
+		return objectOperation.putObjectByInputStream(bucketName, objectKey, inputStream, offset, length, mimeType);
+	}
+	
+	/**
 	 * Put text into a object.
 	 * @param bucketName Bucket name.
 	 * @param objectKey The key of a object.
@@ -175,4 +200,55 @@ public class KS3Client {
 	public String getPresignedUrl(PresignedUrlOptions options) throws Exception{
 		return objectOperation.getPresignedUrl(options);
 	}
+	
+	/**
+	 * Initiate a multipart upload session.
+	 * @param bucketName Bucket name.
+	 * @param objectKey The key of a object.
+	 * @return InitiateMultipartUploadResult instance.
+	 * @throws Exception
+	 */
+	public InitiateMultipartUploadResult initiateMultipartUpload(String bucketName, String objectKey) throws Exception{
+		return objectOperation.initiateMultipartUpload(bucketName, objectKey);
+	}
+	
+	/**
+	 * Upload a part of the object by options.
+	 * @param uploadPartOptions UploadPartOptions instance.
+	 * @return UploadPartResult instance.
+	 * @throws Exception
+	 */
+	public UploadPartResult uploadPart(UploadPartOptions uploadPartOptions) throws Exception{
+		return objectOperation.uploadPart(uploadPartOptions);
+	}
+	
+	/**
+	 * Complete a multipart upload session.
+	 * @param completeMultipartUploadOptions CompleteMultipartUploadOptions instance.
+	 * @return CompleteMultipartUploadResult CompleteMultipartUploadResult instacne.
+	 * @throws Exception
+	 */
+	public CompleteMultipartUploadResult completeMultipartUpload(CompleteMultipartUploadOptions completeMultipartUploadOptions) throws Exception{
+		return objectOperation.completeMultipartUpload(completeMultipartUploadOptions);
+	}
+	
+	/**
+	 * Abort a multipart upload session.This will disable the uploadId of current session.
+	 * @param abortMultipartUploadOptions AbortMultipartUploadOptions instance
+	 * @throws Exception
+	 */
+	public void abortMultipartUpload(AbortMultipartUploadOptions abortMultipartUploadOptions) throws Exception{
+		objectOperation.abortMultipartUpload(abortMultipartUploadOptions);
+	}
+	
+	/**
+	 * Get a list of parts of a object of a multipart upload session.
+	 * @param partListOptions partListOptions instance.
+	 * @return PartList PartList instance
+	 * @throws Exception
+	 */
+	public PartList getPartList(PartListOptions partListOptions) throws Exception{
+		return objectOperation.getPartList(partListOptions);
+	}	
+	
 }

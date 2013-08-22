@@ -13,7 +13,8 @@ import com.ksyun.ks3.sdk.tools.JsonUtils;
  * A object entity that contains the content of the object.
  */
 public class ObjectEntity implements Serializable{
-	
+
+	private static final long serialVersionUID = -7664972008408662875L;
 	private String bucketName;
 	private String objectKey;
 	private InputStream objectValue;
@@ -87,9 +88,16 @@ public class ObjectEntity implements Serializable{
 	}
 	
 	/**
-	 * Get Json of the instance.
+	 * Get JSon of the instance.
 	 */
 	public String toJson(){
 		return JsonUtils.getJson(this);		
+	}
+	
+	/**
+	 * Get String of the instance.
+	 */
+	public String toString(){
+		return this.toJson();
 	}
 }

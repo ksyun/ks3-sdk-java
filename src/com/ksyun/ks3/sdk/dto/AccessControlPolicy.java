@@ -13,6 +13,7 @@ import com.ksyun.ks3.sdk.tools.JsonUtils;
  */
 public class AccessControlPolicy implements Serializable{
 
+	private static final long serialVersionUID = -5019350711193143100L;
 	private String ownerDisplayName;
 	private String ownerID;
 	private String grant;
@@ -87,12 +88,9 @@ public class AccessControlPolicy implements Serializable{
 	}
 	
 	/**
-	 * Get Json of the instance.
+	 * Get JSon of the instance.
 	 */
 	public String toJson(){
 		return JsonUtils.getJson(this);		
 	}
-
-	
-
 }

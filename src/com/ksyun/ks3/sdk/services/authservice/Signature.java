@@ -36,6 +36,8 @@ public class Signature {
 		
 		singleParameter.add("acl");
 		singleParameter.add("uploads");
+		singleParameter.add("partNumber");
+		singleParameter.add("uploadId");
 	}
 	
 	private static String base64encoding(byte[] b){		
@@ -117,9 +119,12 @@ public class Signature {
 		Map<String, String> interestedParams = new TreeMap<String, String>();
 		if(params!=null&&params.size()>0){
 			for(Entry<String,String> entry:params.entrySet()){
-				String lowerKey=entry.getKey().toLowerCase();
-				if(responseHeaders.contains(lowerKey)||singleParameter.contains(lowerKey))
+				String key = entry.getKey();
+				String lowerKey = key.toLowerCase();
+				if(responseHeaders.contains(lowerKey))
 					interestedParams.put(lowerKey, entry.getValue());	
+				if(singleParameter.contains(entry.getKey()))
+					interestedParams.put(key, entry.getValue());	
 			}
 			
 			String paramsStr = "";

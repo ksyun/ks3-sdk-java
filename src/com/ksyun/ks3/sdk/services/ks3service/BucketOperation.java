@@ -45,7 +45,8 @@ public class BucketOperation extends KS3Operation {
 		Map<String,String> params = new HashMap<String,String>();
 		params.put("acl", null);
 		Request request = requestBuilder.setMethod(HttpMethod.GET).setBucket(bucketName).addPamams(params).build();
-		Response response = sendMessageAndKeepAlive(request);		
+		Response response = sendMessageAndKeepAlive(request);	
+		
 		return resultParse.getAccessControlPolicy(response.getBody());
 	}
 
@@ -61,6 +62,7 @@ public class BucketOperation extends KS3Operation {
 		RequestBuilder requestBuilder = requestFactory.getBuilder();	
 		Request request = requestBuilder.setMethod(HttpMethod.GET).setBucket(bucketName).build();
 		Response response = sendMessageAndKeepAlive(request);	
+		
 		return resultParse.getObjectList(response.getBody());
 	}
 	
@@ -85,5 +87,4 @@ public class BucketOperation extends KS3Operation {
 		
 		return resultParse.getObjectList(response.getBody());
 	}
-
 }

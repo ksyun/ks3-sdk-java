@@ -6,11 +6,12 @@ KS3 SDK for Java
 Copyright (C) Kingsoft Cloud
 All rights reserved.
 
-http:/ks3.ksyun.com/
+http://ks3.ksyun.com/
 
 环境要求：
-- J2SE Development Kit (JDK) 6.0或以上版
-- Apache Commons （HTTP Client和Logging）等（已包含在SDK的下载压缩包中）。
+- J2SE Development Kit (JDK) 6.0或以上版。
+- Apache Commons 相关jar。
+- JSon-lib等相关jar，用于POJO的序列化输出。
 - 必须注册有KSC用户账户，并开通KS3服务。
 
 
@@ -41,3 +42,19 @@ http:/ks3.ksyun.com/
 4.修正了objectKey中含有空格、型号等特殊符号的情况下会导致部分功能出现异常的问题。
 5.封装了ResponseException，当用户通过SDK调用S3成功但返回值不为200时，抛出此异常。（即请求成功，调用失败。例如：创建的bucket已经存在。）
 
+------2013年8月19日------
+1.解决了并发操作时Request可能会引发空引用异常的bug。
+2.解决了某些操作不能自动回收连接池内连接致使无法再发送请求的bug。
+
+------2013年8月22日------
+1.重写了构造请求的算法，更优化。
+2.保留原接口的同时，增加了以InputStream，即以流的形式上传文件的接口（putObjectByInputStream），服务器可以边读边上传。
+3.增加了分块上传功能，并提供了多种上传策略供用户选择，详见（KS3MultipartSampleSolution1、KS3MultipartSampleSolution2和KS3MultipartSampleSolution3中的Demo）
+4.所有DTO均实现了Serializable接口，同时均实现了toString方法和toJson方法，方便用户灵活使用。
+5.增加了自动重试机制，当用户由于网络问题引起的请求失败，SDK可以自动进行重试。
+6.提供了一个压力测试的Demo，用户可以使用它作为测试网络和SDK的一个样本。
+
+
+----------------------------------------------------------
+如果您发现任何Bug或者有更好的改进意见，请联系：yangji@kingsoft.com
+我们的进步离不开您的支持！

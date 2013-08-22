@@ -13,6 +13,8 @@ import com.ksyun.ks3.sdk.tools.JsonUtils;
  */
 public class Credential implements Serializable{
 	
+
+	private static final long serialVersionUID = -5862110842558618213L;
 	private String accessKeyId="";
 	private String accessKeySecret="";	
 
@@ -58,9 +60,16 @@ public class Credential implements Serializable{
 	}
 	
 	/**
-	 * Get Json of the instance.
+	 * Get JSon of the instance.
 	 */
 	public String toJson(){
 		return JsonUtils.getJson(this);		
+	}
+	
+	/**
+	 * Get String of the instance.
+	 */
+	public String toString(){
+		return this.toJson();
 	}
 }

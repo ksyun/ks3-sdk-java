@@ -15,6 +15,8 @@ import com.ksyun.ks3.sdk.tools.JsonUtils;
  */
 public class ObjectListOptions implements Serializable{
 	
+
+	private static final long serialVersionUID = 3832354192515739291L;
 	private String bucketName;
 	private String prefix;
 	private String marker;
@@ -121,14 +123,11 @@ public class ObjectListOptions implements Serializable{
 	 */
 	public void setMaxKeys(Integer maxKeys) throws Exception {
 		CodeUtils.checkObjectParams("maxKeys", maxKeys);
-		if (maxKeys.intValue() < 0 || maxKeys.intValue() > 1000)
-		{
-			throw new IllegalArgumentException(("MaxKeys out of range."));
-		} else
-		{
-			this.maxKeys = maxKeys;
-			return;
-		}
+		if (maxKeys < 0 || maxKeys > 1000)
+			throw new IllegalArgumentException("MaxKeys out of range.");
+		
+		this.maxKeys = maxKeys;
+		
 	}
 	
 	/**
@@ -150,12 +149,18 @@ public class ObjectListOptions implements Serializable{
 	}
 	
 	/**
-	 * Get Json of the instance.
+	 * Get JSon of the instance.
 	 */
 	public String toJson(){
 		return JsonUtils.getJson(this);		
 	}
 	
+	/**
+	 * Get String of the instance.
+	 */
+	public String toString(){
+		return this.toJson();
+	}
 	
 
 }

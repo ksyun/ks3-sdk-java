@@ -71,10 +71,16 @@ public class RequestBuilder {
 		return this;
 	}
 	
-	public RequestBuilder addPamams(Map<String,String> paramsMap) throws Exception{		
+	public RequestBuilder addPamams(Map<String,String> params) throws Exception{		
 		CodeUtils.checkObjectParams("params", params);
-		params.putAll(paramsMap);
+		this.params.putAll(params);
 		return this;		
+	}
+	
+	public RequestBuilder addHeaders(Map<String,String> headers) throws Exception{
+		CodeUtils.checkObjectParams("headers", headers);
+		this.headers.putAll(headers);
+		return this;
 	}
 	
 	private void clear(){

@@ -20,9 +20,4 @@ public class EncodingUtils {
 		result = result.replace("*", "%2A");
 		return result;		
 	}
-	
-	public static void main(String[] args) {
-		System.out.println(EncodingUtils.getUrlEncode(""));
-	}
-
 }
