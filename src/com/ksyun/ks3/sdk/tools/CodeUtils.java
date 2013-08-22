@@ -14,9 +14,12 @@ import com.ksyun.ks3.sdk.exceptions.ResponseException;
 
 public class CodeUtils {
 	
-	public static void checkRespsonse(Response response) throws Exception{
-		if(response.getStatusCode()/100<3)
+	public static void checkRespsonse(Response response,boolean isKeepAlive) throws Exception{
+		if(response.getStatusCode()/100<3){
+			if(!isKeepAlive)
+				IOUtils.safelyCloseInputStream(response.getBody());
 			return;
+		}			
 		
 		InputStream is = response.getBody();
 		BufferedReader in = new BufferedReader(new InputStreamReader(is));
@@ -28,7 +31,10 @@ public class CodeUtils {
 			}
 		} catch (Exception e) {
 			throw new Exception("Parse request error failed.");
+		}finally{
+			IOUtils.safelyCloseInputStream(is);
 		}
+	    
 	    throw new ResponseException(response.getStatusCode(),buffer.toString());
 		
 	}
@@ -38,7 +44,8 @@ public class CodeUtils {
 			throw new IllegalArgumentException("null parameter:"+paramKey);		
 	}
 	
-	public static void checkMapParams(String paramKey,Map paramValue) throws Exception{
+	@SuppressWarnings("rawtypes")
+	public static void checkMapParams(String paramKey, Map paramValue) throws Exception{
 		if(paramValue==null||paramKey.length()==0)
 			throw new IllegalArgumentException("null parameter:"+paramKey);		
 	}

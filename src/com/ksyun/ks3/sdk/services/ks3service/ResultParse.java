@@ -24,8 +24,13 @@ import org.w3c.dom.NodeList;
 
 import com.ksyun.ks3.sdk.dto.AccessControlPolicy;
 import com.ksyun.ks3.sdk.dto.Bucket;
+import com.ksyun.ks3.sdk.dto.CompleteMultipartUploadResult;
+import com.ksyun.ks3.sdk.dto.InitiateMultipartUploadResult;
 import com.ksyun.ks3.sdk.dto.ObjectInfo;
 import com.ksyun.ks3.sdk.dto.ObjectList;
+import com.ksyun.ks3.sdk.dto.Owner;
+import com.ksyun.ks3.sdk.dto.PartInfo;
+import com.ksyun.ks3.sdk.dto.PartList;
 import com.ksyun.ks3.sdk.tools.IOUtils;
 
 public class ResultParse {
@@ -52,6 +57,128 @@ public class ResultParse {
 		}
 		
 		return doc.getDocumentElement();
+	}
+	
+	public InitiateMultipartUploadResult getInitiateMultipartUploadResult(InputStream is) throws Exception{
+		
+		Element root;
+		try {
+			root = getRootElement(is);		
+		} catch (Exception e) {
+			throw e;
+		}		
+		
+		String bucketName = root.getElementsByTagName("Bucket").item(0).getTextContent();
+		String objectKey = root.getElementsByTagName("Key").item(0).getTextContent();
+		String uploadId = root.getElementsByTagName("UploadId").item(0).getTextContent();
+		
+		IOUtils.safelyCloseInputStream(is);
+		
+		return new InitiateMultipartUploadResult(uploadId, bucketName, objectKey);		
+	}	
+	
+	public CompleteMultipartUploadResult getCompleteMultipartUploadResult(InputStream is) throws Exception{
+		
+		Element root;
+		try {
+			root = getRootElement(is);		
+		} catch (Exception e) {
+			throw e;
+		}		
+		
+		String bucketName = root.getElementsByTagName("Bucket").item(0).getTextContent();
+		String objectKey = root.getElementsByTagName("Key").item(0).getTextContent();
+		String eTag = root.getElementsByTagName("ETag").item(0).getTextContent();
+		String location = root.getElementsByTagName("Location").item(0).getTextContent();
+		
+		IOUtils.safelyCloseInputStream(is);
+		
+		return new CompleteMultipartUploadResult(bucketName, objectKey, eTag, location);
+		
+	}
+	
+	public PartList getPartList(InputStream is) throws Exception{
+		
+		PartList partList;
+		
+		Element root;
+		try {
+			root = getRootElement(is);		
+		} catch (Exception e) {
+			throw e;
+		}		
+		
+		String bucketName = root.getElementsByTagName("Bucket").item(0).getTextContent();
+		String uploadId = root.getElementsByTagName("UploadId").item(0).getTextContent();
+		String objectKey = root.getElementsByTagName("Key").item(0).getTextContent();
+		String storageClass = root.getElementsByTagName("StorageClass").item(0).getTextContent();
+		
+		String partNumberMarkerStr = root.getElementsByTagName("PartNumberMarker").item(0).getTextContent();
+		Integer partNumberMarker = null;		
+		if(partNumberMarkerStr!=null&&partNumberMarkerStr.trim().length()>0)
+			partNumberMarker = Integer.valueOf(partNumberMarkerStr);
+		
+		
+		NodeList tmpNodelist = root.getElementsByTagName("NextPartNumberMarker");		
+		Integer nextPartNumberMarker = null;
+		if(tmpNodelist!=null&&tmpNodelist.getLength()>0){
+			String nextPartNumberMarkerStr = tmpNodelist.item(0).getTextContent();
+			if(nextPartNumberMarkerStr!=null&&nextPartNumberMarkerStr.trim().length()>0)
+				nextPartNumberMarker = Integer.valueOf(nextPartNumberMarkerStr);
+		}
+		
+		Integer maxParts = Integer.valueOf(root.getElementsByTagName("MaxParts").item(0).getTextContent());
+		Boolean isTruncated = Boolean.valueOf(root.getElementsByTagName("IsTruncated").item(0).getTextContent());
+		
+		Element initiatorNode = (Element)root.getElementsByTagName("Initiator").item(0);
+		String displayName = initiatorNode.getElementsByTagName("DisplayName").item(0).getTextContent();
+		String id = initiatorNode.getElementsByTagName("ID").item(0).getTextContent();
+		Owner initiator = new Owner(displayName, id);
+		
+		Element OwnerNode = (Element)root.getElementsByTagName("Owner").item(0);
+		displayName = OwnerNode.getElementsByTagName("DisplayName").item(0).getTextContent();
+		id = initiatorNode.getElementsByTagName("ID").item(0).getTextContent();
+		Owner owner = new Owner(displayName, id);
+		
+		partList = new PartList(bucketName, objectKey, uploadId, maxParts, partNumberMarker, owner, initiator, storageClass, isTruncated, nextPartNumberMarker);
+				
+		NodeList partListNodes = root.getElementsByTagName("Part");
+		int len = partListNodes.getLength();
+		
+		try {
+			
+			for (int i=0; i<len; i++)
+			{
+				Element node = (Element)partListNodes.item(i);
+				
+				Node partNumberNode = node.getElementsByTagName("PartNumber").item(0);
+				Long partNumber = Long.valueOf(partNumberNode.getTextContent());
+				
+				@SuppressWarnings("unused")
+				Node lastModifiedNode = node.getElementsByTagName("LastModified").item(0);
+//				Date lastModified = sdf.parse(lastModifiedNode.getTextContent());
+				Date lastModified = new Date();
+				
+				Node eTagNumberNode = node.getElementsByTagName("ETag").item(0);
+				String eTag = eTagNumberNode.getTextContent();
+				
+				Node sizeNode = node.getElementsByTagName("Size").item(0);
+				Long size = Long.valueOf(sizeNode.getTextContent());
+				
+				
+				partList.addPart(new PartInfo(partNumber.intValue(), lastModified, eTag, size));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("response parse error");
+		}	
+		
+		finally{			
+			IOUtils.safelyCloseInputStream(is);
+		}
+				
+		return partList;		
 	}
 	
 	public AccessControlPolicy getAccessControlPolicy(InputStream is) throws Exception{

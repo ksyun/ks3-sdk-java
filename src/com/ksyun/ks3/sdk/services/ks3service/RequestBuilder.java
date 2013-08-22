@@ -25,7 +25,6 @@ public class RequestBuilder {
 	private Map<String, String> headers = new HashMap<String, String>();
 	private Map<String, String> params = new HashMap<String, String>();
 	private Credential credential;
-	private String acl="";
 
 	public RequestBuilder(Credential credential) throws Exception {
 		CodeUtils.checkObjectParams("credential", credential);
@@ -71,12 +70,16 @@ public class RequestBuilder {
 		params.put(paramKey, paramValue);
 		return this;
 	}
-
-	public RequestBuilder setAclFlag(Boolean isSetAcl) throws Exception {
-
-		CodeUtils.checkObjectParams("isSetAcl", isSetAcl);
-		if (isSetAcl)
-			this.acl = "?acl";
+	
+	public RequestBuilder addPamams(Map<String,String> params) throws Exception{		
+		CodeUtils.checkObjectParams("params", params);
+		this.params.putAll(params);
+		return this;		
+	}
+	
+	public RequestBuilder addHeaders(Map<String,String> headers) throws Exception{
+		CodeUtils.checkObjectParams("headers", headers);
+		this.headers.putAll(headers);
 		return this;
 	}
 	
@@ -87,7 +90,6 @@ public class RequestBuilder {
 		this.objectValue=null;		
 		this.headers=new HashMap<String, String>();
 		this.params=new HashMap<String, String>();
-		this.acl="";
 	}
 	
 
@@ -108,8 +110,7 @@ public class RequestBuilder {
 				// when objectValue is not null
 				if (objectValue != null)
 					request.setBody(objectValue);
-			} else {
-				url += this.acl;
+				
 			}
 		}
 

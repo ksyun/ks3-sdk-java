@@ -16,6 +16,8 @@ import com.ksyun.ks3.sdk.tools.JsonUtils;
  */
 public class ObjectList implements Serializable{
 	
+
+	private static final long serialVersionUID = 8017243791817876379L;
 	private String bucketName;
 	private String maxKeys;
 	private String prefix;
@@ -141,10 +143,17 @@ public class ObjectList implements Serializable{
 	}
 	
 	/**
-	 * Get Json of the instance.
+	 * Get JSon of the instance.
 	 */
 	public String toJson(){
 		return JsonUtils.getJson(this);		
+	}
+	
+	/**
+	 * Get String of the instance.
+	 */
+	public String toString(){
+		return this.toJson();
 	}
 
 }

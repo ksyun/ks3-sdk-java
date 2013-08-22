@@ -19,7 +19,7 @@ public class Request {
 	private Map<String,String> params;
 	private Credential credential;
 	private String bucekt;
-	private String object;	
+	private String object;
 
 	public Request(){
 		headers = new HashMap<String,String>();

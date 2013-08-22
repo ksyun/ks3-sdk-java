@@ -13,6 +13,8 @@ import com.ksyun.ks3.sdk.tools.JsonUtils;
  * This is just a model of a bucket.
  */
 public class Bucket implements Serializable{
+
+	private static final long serialVersionUID = -2229418034330183866L;
 	private String name;
 	private Date creationDate;
 	
@@ -23,8 +25,8 @@ public class Bucket implements Serializable{
 	
 	/**
 	 * Construct a bucket by bucket name and the creation date.
-	 * @param name Bucket name.
-	 * @param creationDate Creation date.
+	 * @param name bucket name.
+	 * @param creationDate creation date.
 	 */
 	public Bucket(String name, Date creationDate) {
 		
@@ -65,12 +67,17 @@ public class Bucket implements Serializable{
 	}
 	
 	/**
-	 * Get Json of the instance.
+	 * Get JSon of the instance.
 	 */
 	public String toJson(){
 		return JsonUtils.getJson(this);		
 	}
 	
-	
+	/**
+	 * Get String of the instance.
+	 */
+	public String toString(){
+		return this.toJson();
+	}
 
 }

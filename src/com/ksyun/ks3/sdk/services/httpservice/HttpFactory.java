@@ -14,10 +14,13 @@ import com.ksyun.ks3.sdk.tools.EncodingUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.params.ClientPNames;
@@ -39,11 +42,12 @@ import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HttpContext;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -52,6 +56,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SimpleTimeZone;
 
+@SuppressWarnings("deprecation")
 public class HttpFactory {
 
 	private HttpRequestBase getRequestBase(Request request) {
@@ -68,29 +73,31 @@ public class HttpFactory {
 		String bucket = request.getBucekt();
 		if (bucket != null && bucket.trim().length() != 0)
 			url = bucket + "." + url;
-			// url=url+"/"+bucket;
 		
 
 		String object = request.getObject();
 		if (object != null && object.trim().length() != 0){
-			
-//			try {
-//				url = url + "/" + URLEncoder.encode(object,"UTF-8");//				
-//			} catch (UnsupportedEncodingException e) {
-//			};
-			url = url + "/" + EncodingUtils.getUrlEncode(object);
-		}
-			
+			url = url + "/" + EncodingUtils.getUrlEncode(object);			
+		}			
 
 		url  = "http://"+ url;
 
 		Map<String, String> params = request.getParams();
 		if (params != null && params.size() > 0) {
+			
 			url += "?";
-			for (Entry<String, String> entry : params.entrySet()) {
-				String kv = entry.getKey() + "=" + entry.getValue() + "&";
-				url += kv;
+			
+			for(Entry<String, String> entry :params.entrySet()){
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if(key!=null&&!key.trim().equals("")){
+					if(value==null)
+						url+=key+"&";
+					else
+						url+=key+"="+value+"&";
+				}				
 			}
+
 			url = url.substring(0, url.length() - 1);
 		}
 		
@@ -102,22 +109,32 @@ public class HttpFactory {
 			httpRequestBase = new HttpDelete(url);
 		else if (method.equals(HttpMethod.HEAD))
 			httpRequestBase = new HttpHead(url);
+		else if(method.equals(HttpMethod.POST)){
+			
+			HttpPost postMethod = new HttpPost(url);
+			if (content != null) {		
+				HttpEntity entity = new InputStreamEntity(content,Long.valueOf(request.getHeaders().get("content-length")));				
+				postMethod.setEntity(entity);
+			}
+			httpRequestBase = postMethod;
+		}
+				
 		else if (method.equals(HttpMethod.PUT)) {
 			HttpPut putMethod = new HttpPut(url);
-			if (content != null) {			
+			if (content != null) {		
 				HttpEntity entity = new InputStreamEntity(content,Long.valueOf(request.getHeaders().get("content-length")));				
 				putMethod.setEntity(entity);
 			}
 			httpRequestBase = putMethod;
-		} else
+		} 
+		else
 			throw new IllegalArgumentException("Unsupported HTTP method:"
 					+ request.getMethod());
 		
 		return httpRequestBase;
 	}
 	
-    @SuppressWarnings("deprecation")
-	public HttpClient getHttpClient() {
+    public HttpClient getHttpClient() {
         HttpParams params = new BasicHttpParams();
         HttpProtocolParams.setUseExpectContinue(params, false);
         HttpProtocolParams.setUserAgent(params, ConnectioinConfig.userAgent);
@@ -154,7 +171,30 @@ public class HttpFactory {
                 .getSocketFactory(), 443));
         ThreadSafeClientConnManager conMgr = new ThreadSafeClientConnManager(
                 params, schReg);
-        return new DefaultHttpClient(conMgr, params);
+        
+        DefaultHttpClient client = new DefaultHttpClient(conMgr, params);
+        
+        
+        //Auto retry.
+        client.setHttpRequestRetryHandler(new HttpRequestRetryHandler() {
+			
+			@Override
+			public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
+				
+				if(executionCount > ConnectioinConfig.maxRetryCount)
+					 return false;
+				
+				if(exception instanceof NoHttpResponseException)
+					return true; 
+				
+				if(exception instanceof SocketTimeoutException)
+					return true;
+				
+				return false;
+			}
+		});
+        
+        return client;
     }
 
 	public HttpClient generateHttpClient() {
