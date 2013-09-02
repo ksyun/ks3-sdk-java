@@ -49,6 +49,9 @@ public class KS3PressureTestSample {
 		//定义线程池
 		ExecutorService threadPool = Executors.newFixedThreadPool(CONCURRENCIES);
 		
+		//计时开始
+		Long start = System.currentTimeMillis();
+		
 		//fileList 记录下有哪些文件被上传了，一会方便删除
 		List<String> fileList = Collections.synchronizedList(new ArrayList<String>());
 		
@@ -65,6 +68,9 @@ public class KS3PressureTestSample {
         }
 		
 		System.out.println("[上传完毕]");
+		
+		//计时结束
+		Long end = System.currentTimeMillis();
 		
 		System.out.println("\n[删除Object（可能会花费一些时间）]");		
 		for(int i=0;i<fileList.size();i++){
@@ -92,7 +98,10 @@ public class KS3PressureTestSample {
 		
 		float successPercent = ((float)fileList.size()/FILE_NUMBER)*100;
 		
+		System.out.println("[应上传文件个数:"+FILE_NUMBER+"]");
+		System.out.println("[成功上传文件个数:"+fileList.size()+"]");
 		System.out.println("[上传成功率:"+successPercent + "%]");
+		System.out.println("[上传耗时:"+(end-start)+"ms]");
 		
 	}
 	

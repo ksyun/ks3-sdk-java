@@ -23,7 +23,7 @@ import com.ksyun.ks3.sdk.dto.ObjectList;
 /**
  * 该Sample展示了用户常用的基本功能。
  */
-public class KS3SinpleSamples {
+public class KS3SimpleSamples {
 	
 	private static final String ACCESS_KEY_ID = "<INSERT YOUR ACCESS_KEY_ID ID HERE>";
 	private static final String ACCESS_KEY_SECRET = "<INSERT YOUR KSS ACCESS_KEY_SECRET HERE>";

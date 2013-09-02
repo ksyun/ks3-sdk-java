@@ -16,8 +16,9 @@ import com.ksyun.ks3.sdk.tools.CodeUtils;
 
 
 public class RequestBuilder {
-
-	private final String host = "kss.ksyun.com";
+	
+	
+	private String host;
 	private String method;
 	private String bucket;
 	private String objectKey;
@@ -25,9 +26,12 @@ public class RequestBuilder {
 	private Map<String, String> headers = new HashMap<String, String>();
 	private Map<String, String> params = new HashMap<String, String>();
 	private Credential credential;
+	private final String DEFAULT_HOST = "kss.ksyun.com";
+	private final String IMG_HOST = "img.ks3.ksyun.com";
 
 	public RequestBuilder(Credential credential) throws Exception {
 		CodeUtils.checkObjectParams("credential", credential);
+		this.host = DEFAULT_HOST;
 		this.credential = credential;
 	}
 
@@ -80,6 +84,11 @@ public class RequestBuilder {
 	public RequestBuilder addHeaders(Map<String,String> headers) throws Exception{
 		CodeUtils.checkObjectParams("headers", headers);
 		this.headers.putAll(headers);
+		return this;
+	}
+	
+	public RequestBuilder setThumbnailHost() throws Exception{
+		this.host = this.IMG_HOST;
 		return this;
 	}
 	

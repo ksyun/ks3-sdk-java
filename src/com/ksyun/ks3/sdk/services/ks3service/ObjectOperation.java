@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.ksyun.ks3.sdk.dto.AbortMultipartUploadOptions;
+import com.ksyun.ks3.sdk.dto.AccessControlList;
+import com.ksyun.ks3.sdk.dto.AccessControlPolicy;
 import com.ksyun.ks3.sdk.dto.CompleteMultipartUploadOptions;
 import com.ksyun.ks3.sdk.dto.CompleteMultipartUploadResult;
 import com.ksyun.ks3.sdk.dto.Credential;
@@ -67,6 +69,26 @@ public class ObjectOperation extends KS3Operation {
 		return new ObjectEtag(eTag);
 	}
 	
+	public ObjectEtag putObject(String bucketName, String objectKey, File file, String mimeType,AccessControlList acl)
+			throws Exception {
+		
+		if(mimeType==null||mimeType.trim().equals(""))
+			mimeType = "application/octet-stream";		
+
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
+		Request request = requestBuilder.setMethod(HttpMethod.PUT)
+				.setBucket(bucketName).setObjectKey(objectKey).setObjectValue(new FileInputStream(file))
+				.addHeader("content-type", mimeType)
+				.addHeader("content-length", String.valueOf(file.length()))
+				.addHeader("x-kss-acl",acl.toString())
+				.build();
+		
+		Response response = sendMessage(request);
+		
+		String eTag = response.getHeaders().get("ETag");
+		return new ObjectEtag(eTag);
+	}
+	
 	public ObjectEtag putObjectByInputStream(String bucketName, String objectKey, InputStream inputStream, 
 			int offset, int length, String mimeType) throws Exception {
 		
@@ -102,6 +124,42 @@ public class ObjectOperation extends KS3Operation {
 		return new ObjectEtag(eTag);
 	}
 	
+	public ObjectEtag putObjectByInputStream(String bucketName, String objectKey, InputStream inputStream, 
+			int offset, int length, String mimeType,AccessControlList acl) throws Exception {
+		
+		// 起始位置不能在length之后
+		if (offset < 0 || offset > length)
+			throw new IllegalArgumentException("Illegal arguments");
+		
+		//得到实际的length
+		length = length - offset;
+		
+		//处理偏移量
+		try {
+			inputStream.skip(offset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("Skip data failed.");
+		}
+			
+		
+		if(mimeType==null||mimeType.trim().equals(""))
+			mimeType = "application/octet-stream";		
+
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
+		Request request = requestBuilder.setMethod(HttpMethod.PUT)
+				.setBucket(bucketName).setObjectKey(objectKey).setObjectValue(inputStream)
+				.addHeader("content-type", mimeType)
+				.addHeader("content-length", String.valueOf(length))
+				.addHeader("x-kss-acl",acl.toString())
+				.build();
+		
+		Response response = sendMessage(request);
+		
+		String eTag = response.getHeaders().get("ETag");
+		return new ObjectEtag(eTag);
+	}
+	
 	public ObjectEtag putStringObject(String bucketName, String objectKey,String content) throws Exception{	
 		
 		RequestBuilder requestBuilder = requestFactory.getBuilder();		
@@ -114,8 +172,23 @@ public class ObjectOperation extends KS3Operation {
 		Response response = sendMessage(request);
 		
 		String eTag = response.getHeaders().get("ETag");		
-		return new ObjectEtag(eTag);
+		return new ObjectEtag(eTag);		
+	}
+	
+	public ObjectEtag putStringObject(String bucketName, String objectKey,String content,AccessControlList acl) throws Exception{	
 		
+		RequestBuilder requestBuilder = requestFactory.getBuilder();		
+		Request request = requestBuilder.setMethod(HttpMethod.PUT)
+				.setBucket(bucketName).setObjectKey(objectKey).setObjectValue(new ByteArrayInputStream(content.getBytes()))
+				.addHeader("content-type", "text/plain; charset=UTF-8")
+				.addHeader("content-length", String.valueOf(content.length()))
+				.addHeader("x-kss-acl",acl.toString())
+				.build();
+		
+		Response response = sendMessage(request);
+		
+		String eTag = response.getHeaders().get("ETag");		
+		return new ObjectEtag(eTag);		
 	}
 	
 	public ObjectEntity getObject(String bucketName, String objectKey) throws Exception{
@@ -316,8 +389,69 @@ public class ObjectOperation extends KS3Operation {
 		Response response = sendMessageAndKeepAlive(request);	
 		
 		
-		return resultParse.getPartList(response.getBody());
+		return resultParse.getPartList(response.getBody());		
+	}
+	
+	public AccessControlPolicy getObjectACL(String bucketName, String objectKey) throws Exception{
 		
+		RequestBuilder requestBuilder = requestFactory.getBuilder();
+		Map<String,String> params = new HashMap<String,String>();
+		params.put("acl", null);
+		Request request = requestBuilder.setMethod(HttpMethod.GET).setBucket(bucketName).setObjectKey(objectKey).addPamams(params).build();
+		Response response = sendMessageAndKeepAlive(request);
+		
+		return resultParse.getAccessControlPolicy(response.getBody());
+	}
+	
+	public void setObjectACL(String bucketName, String objectKey,AccessControlList acl) throws Exception {
+		
+		RequestBuilder requestBuilder = requestFactory.getBuilder();
+		Map<String,String> params = new HashMap<String,String>();
+		params.put("acl", null);
+		Request request = requestBuilder.setMethod(HttpMethod.PUT).setBucket(bucketName).setObjectKey(objectKey).addHeader("x-kss-acl",acl.toString()).addPamams(params).build();		
+		sendMessage(request);
+	}
+	
+	public String getThumbnailUrl(String bucketName, String objectKey,int width,int height,boolean signed,int expires) throws Exception{
+		
+		if(width<=0||height<=0)
+			throw new IllegalArgumentException("Illegal parameters");
+		
+		if(signed&&expires<0)
+			throw new IllegalArgumentException("Illegal parameters");
+		
+		objectKey = EncodingUtils.getUrlEncode(objectKey);		
+		
+		Map<String,String> params = new HashMap<String, String>();
+		params.put("thumbnail", null);
+		params.put("width", String.valueOf(width));
+		params.put("height", String.valueOf(height));
+		
+		String unsignedUrl = getUnsignedThumbnailUrl(bucketName,objectKey,params);
+		if(!signed)
+			return unsignedUrl;
+		
+		String expTime = String.valueOf(new Date().getTime()/1000+expires);
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
+		requestBuilder = requestBuilder.setMethod("GET").setThumbnailHost().setBucket(bucketName).setObjectKey(objectKey).addHeader("Date",expTime);
+		
+		Request request = requestBuilder.addPamams(params).build();
+		
+		String signature = Signature.getSignatureByRequest(request);
+		signature = URLEncoder.encode(signature,"UTF-8");
+		String accessKeyId = request.getCredential().getAccessKeyId();	
+		
+		String url = unsignedUrl + "&KSSAccessKeyId="+accessKeyId+"&Signature="+signature+"&Expires="+expTime;	
+		return url;
+	}
+	
+	private String getUnsignedThumbnailUrl(String bucketName, String objectKey,Map<String,String> params){
+		String url = "http://img.ks3.ksyun.com/"+bucketName+"/"+objectKey+"?thumbnail";
+		for(Entry<String,String> entry:params.entrySet()){
+			if(!entry.getKey().equals("thumbnail"))
+				url=url+"&"+entry.getKey()+"="+entry.getValue();
+		}
+		return url.substring(0,url.length());
 	}	
 	
 	private String buildMultipartRequestXml(List<UploadPart> uploadList){
@@ -334,5 +468,5 @@ public class ObjectOperation extends KS3Operation {
 		xml.append("</CompleteMultipartUpload>");
 		
 		return xml.toString();	
-	}	
+	}
 }
