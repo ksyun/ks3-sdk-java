@@ -9,7 +9,7 @@ import java.io.Serializable;
 import com.ksyun.ks3.sdk.tools.JsonUtils;
 
 /**
- * AccessControlPolicy describes the basic access polices about a bucket.
+ * AccessControlPolicy describes the basic access polices about a bucket/object.
  */
 public class AccessControlPolicy implements Serializable{
 
@@ -36,7 +36,7 @@ public class AccessControlPolicy implements Serializable{
 	 * Get the string express of the instance.
 	 */
 	public String toString() {
-		return "AccessControlPolicy :" + this.grant;
+		return this.grant;
 	}
 
 	/**
@@ -92,5 +92,14 @@ public class AccessControlPolicy implements Serializable{
 	 */
 	public String toJson(){
 		return JsonUtils.getJson(this);		
+	}
+	
+	/**
+	 * Judge whether this ACL is specific AccessControlList instance.
+	 * @param acl AccessControlList instance.
+	 * @return Compare result.
+	 */
+	public boolean equals(AccessControlList acl){
+		return this.grant.equals(acl.toString());
 	}
 }

@@ -22,6 +22,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 
+import com.ksyun.ks3.sdk.dto.AccessControlList;
 import com.ksyun.ks3.sdk.dto.AccessControlPolicy;
 import com.ksyun.ks3.sdk.dto.Bucket;
 import com.ksyun.ks3.sdk.dto.CompleteMultipartUploadResult;
@@ -181,7 +182,8 @@ public class ResultParse {
 		return partList;		
 	}
 	
-	public AccessControlPolicy getAccessControlPolicy(InputStream is) throws Exception{
+	public AccessControlPolicy getAccessControlPolicy(InputStream is) throws Exception{		
+		
 		Element root;
 		try {
 			root = getRootElement(is);		
@@ -200,8 +202,18 @@ public class ResultParse {
 		
 		NodeList accessControlList = root.getElementsByTagName("AccessControlList");
 		Element accessControl = (Element)accessControlList.item(0);
-		Node grantNode = accessControl.getElementsByTagName("Grant").item(0);
-		String grant = grantNode.getTextContent();
+		
+		String grant = null;
+		NodeList grants = accessControl.getElementsByTagName("Grant");
+		int grantOptions  = grants.getLength();
+		if(grantOptions==1)
+			grant = AccessControlList.PRIVATE.toString();//Owner full control
+		else if(grantOptions==2)
+			grant = AccessControlList.READONLY.toString();//Owner full control + public read
+		else if (grantOptions==3)
+			grant = AccessControlList.PUBLIC.toString();//Owner full control + public read + public write
+		else 
+			throw new Exception("Unknown ACL.");
 		
 		IOUtils.safelyCloseInputStream(is);
 		

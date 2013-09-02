@@ -133,6 +133,20 @@ public class KS3Client {
 	}
 	
 	/**
+	 * Upload a file into a object.
+	 * @param bucketName Bucket name.
+	 * @param objectKey The key of a object.
+	 * @param file The file to upload.
+	 * @param mimeType Mime type according to the type of the file.
+	 * @param acl The access policy list of the object.
+	 * @return The eTag of the object.
+	 * @throws Exception
+	 */
+	public ObjectEtag putObject(String bucketName, String objectKey, File file, String mimeType,AccessControlList acl) throws Exception{
+		return objectOperation.putObject(bucketName, objectKey, file, mimeType, acl);
+	}
+	
+	/**
 	 * Upload data by input stream.
 	 * @param bucketName Bucket name.
 	 * @param objectKey The key of a object.
@@ -149,6 +163,23 @@ public class KS3Client {
 	}
 	
 	/**
+	 * Upload data by input stream.
+	 * @param bucketName Bucket name.
+	 * @param objectKey The key of a object.
+	 * @param inputStream The input stream of the data.
+	 * @param offset The offset of the input stream.
+	 * @param length The length of the input stream.
+	 * @param mimeType Mime type according to the type of the file.
+	 * @param acl The access policy list of the object.
+	 * @return The eTag of the object.
+	 * @throws Exception
+	 */
+	public ObjectEtag putObjectByInputStream(String bucketName, String objectKey, InputStream inputStream, 
+			int offset, int length, String mimeType, AccessControlList acl) throws Exception{
+		return objectOperation.putObjectByInputStream(bucketName, objectKey, inputStream, offset, length, mimeType,acl);
+	}
+	
+	/**
 	 * Put text into a object.
 	 * @param bucketName Bucket name.
 	 * @param objectKey The key of a object.
@@ -158,6 +189,19 @@ public class KS3Client {
 	 */
 	public ObjectEtag putStringObject(String bucketName, String objectKey,String content) throws Exception{	
 		return objectOperation.putStringObject(bucketName, objectKey, content);
+	}
+	
+	/**
+	 * Put text into a object.
+	 * @param bucketName Bucket name.
+	 * @param objectKey The key of a object.
+	 * @param content The text of the object content.
+	 * @param acl The access policy list of the object.
+	 * @return The eTag of the object.
+	 * @throws Exception
+	 */
+	public ObjectEtag putStringObject(String bucketName, String objectKey,String content, AccessControlList acl) throws Exception{	
+		return objectOperation.putStringObject(bucketName, objectKey, content, acl);
 	}
 	
 	/**
@@ -250,5 +294,42 @@ public class KS3Client {
 	public PartList getPartList(PartListOptions partListOptions) throws Exception{
 		return objectOperation.getPartList(partListOptions);
 	}	
+	
+	/**
+	 * Get the url of thumbnail of a picture
+	 * @param bucketName Bucket name.
+	 * @param objectKey The key of a object.
+	 * @param width The width of thumbnail.
+	 * @param height The height of thumbnail.
+	 * @param signed Whether with signature
+	 * @param expires If you get a signed url,expires is expires.
+	 * @return The url of thumbnail.
+	 * @throws Exception
+	 */
+	public String getThumbnailUrl(String bucketName, String objectKey,int width,int height,boolean signed,int expires) throws Exception{
+		return objectOperation.getThumbnailUrl(bucketName, objectKey, width, height, signed, expires);
+	}
+	
+	/**
+	 * Set the access control policy to a object.
+	 * @param bucketName Bucket name.
+	 * @param objectKey The key of object.
+	 * @param acl The AccessControlPolicy instance that describes your policy.
+	 * @throws Exception
+	 */	
+	public void setObjectACL(String bucketName, String objectKey,AccessControlList acl) throws Exception{
+		objectOperation.setObjectACL(bucketName, objectKey, acl);
+	}
+	
+	/**
+	 * Get the access control policy of the specified object.
+	 * @param bucketName Bucket name.
+	 * @param objectKey The key of object.
+	 * @return a AccessControlPolicy instance that describes your policy.
+	 * @throws Exception
+	 */
+	public AccessControlPolicy getObjectACL(String bucketName, String objectKey) throws Exception{
+		return objectOperation.getObjectACL(bucketName, objectKey);
+	}
 	
 }
