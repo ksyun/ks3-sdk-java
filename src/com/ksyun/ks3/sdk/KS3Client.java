@@ -21,6 +21,7 @@ import com.ksyun.ks3.sdk.dto.ObjectEtag;
 import com.ksyun.ks3.sdk.dto.ObjectGetOptions;
 import com.ksyun.ks3.sdk.dto.ObjectList;
 import com.ksyun.ks3.sdk.dto.ObjectListOptions;
+import com.ksyun.ks3.sdk.dto.ObjectMetadata;
 import com.ksyun.ks3.sdk.dto.PartList;
 import com.ksyun.ks3.sdk.dto.PartListOptions;
 import com.ksyun.ks3.sdk.dto.PresignedUrlOptions;
@@ -330,6 +331,17 @@ public class KS3Client {
 	 */
 	public AccessControlPolicy getObjectACL(String bucketName, String objectKey) throws Exception{
 		return objectOperation.getObjectACL(bucketName, objectKey);
+	}
+	
+	/**
+	 * Get the metadata of your object.
+	 * @param bucketName Bucket name.
+	 * @param objectKey The key of object.
+	 * @return The metadata of your object.
+	 * @throws Exception
+	 */
+	public ObjectMetadata headObject(String bucketName, String objectKey) throws Exception{
+		return objectOperation.headObject(bucketName, objectKey);
 	}
 	
 }
