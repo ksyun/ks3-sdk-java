@@ -27,6 +27,7 @@ import com.ksyun.ks3.sdk.dto.InitiateMultipartUploadResult;
 import com.ksyun.ks3.sdk.dto.ObjectEntity;
 import com.ksyun.ks3.sdk.dto.ObjectEtag;
 import com.ksyun.ks3.sdk.dto.ObjectGetOptions;
+import com.ksyun.ks3.sdk.dto.ObjectMetadata;
 import com.ksyun.ks3.sdk.dto.PartList;
 import com.ksyun.ks3.sdk.dto.PartListOptions;
 import com.ksyun.ks3.sdk.dto.PresignedUrlOptions;
@@ -48,6 +49,16 @@ public class ObjectOperation extends KS3Operation {
 	public ObjectOperation(HttpRequestor requestor, Credential credential)
 			throws Exception {
 		super(requestor, credential);
+	}
+	
+	public ObjectMetadata headObject(String bucketName, String objectKey) throws Exception{
+		
+		RequestBuilder requestBuilder = requestFactory.getBuilder();	
+		Request request = requestBuilder.setMethod(HttpMethod.HEAD)
+				.setBucket(bucketName).setObjectKey(objectKey).build();
+		
+		Response response = sendMessage(request);
+		return new ObjectMetadata(response.getHeaders());
 	}
 
 	public ObjectEtag putObject(String bucketName, String objectKey, File file, String mimeType)
@@ -230,7 +241,7 @@ public class ObjectOperation extends KS3Operation {
 		Request request = requestBuilder.build();
 		Response response = sendMessageAndKeepAlive(request);
 		
-		return new ObjectEntity(bucketName, objectKey, response.getBody());
+		return new ObjectEntity(bucketName, objectKey, response.getBody(),new ObjectMetadata(response.getHeaders()));
 	}
 	
 	public void deleteObject(String bucketName, String objectKey) throws Exception{

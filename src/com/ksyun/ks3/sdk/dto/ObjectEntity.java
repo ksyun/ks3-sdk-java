@@ -17,6 +17,7 @@ public class ObjectEntity implements Serializable{
 	private static final long serialVersionUID = -7664972008408662875L;
 	private String bucketName;
 	private String objectKey;
+	private ObjectMetadata metadata;
 	private InputStream objectValue;
 	
 	/**
@@ -39,6 +40,20 @@ public class ObjectEntity implements Serializable{
 		this.bucketName = bucketName;
 		this.objectKey = objectKey;
 		this.objectValue = objectValue;
+	}
+	
+	/**
+	 * Construct a object entity by bucket name,object key and the object value.
+	 * @param bucketName Bucket name.
+	 * @param objectKey Object key.
+	 * @param objectValue Object value.
+	 * @param metadata Metadata of object.
+	 */
+	public ObjectEntity(String bucketName, String objectKey,InputStream objectValue,ObjectMetadata metadata) {
+		this.bucketName = bucketName;
+		this.objectKey = objectKey;
+		this.objectValue = objectValue;
+		this.setMetadata(metadata);
 	}
 	
 	/**
@@ -88,6 +103,22 @@ public class ObjectEntity implements Serializable{
 	}
 	
 	/**
+	 * Get the metadata of object.
+	 * @return The metadata of object.
+	 */
+	public ObjectMetadata getMetadata() {
+		return metadata;
+	}
+
+	/**
+	 * Set the metadata of object.
+	 * @param metadata The metadata of object.
+	 */
+	public void setMetadata(ObjectMetadata metadata) {
+		this.metadata = metadata;
+	}	
+	
+	/**
 	 * Get JSon of the instance.
 	 */
 	public String toJson(){
@@ -100,4 +131,6 @@ public class ObjectEntity implements Serializable{
 	public String toString(){
 		return this.toJson();
 	}
+
+	
 }
