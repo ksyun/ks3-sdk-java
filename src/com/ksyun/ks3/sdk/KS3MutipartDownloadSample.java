@@ -68,6 +68,8 @@ public class KS3MutipartDownloadSample {
 		File target = new File("/tmp/"+"save_"+objectKey);
 		if(!target.exists())
 			target.createNewFile();
+		else
+			System.out.println("文件已经存在");
 		
 		//逐块下载文件
 		for (int i = 0; i < partCount; i++) {

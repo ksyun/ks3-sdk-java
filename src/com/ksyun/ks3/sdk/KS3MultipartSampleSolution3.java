@@ -60,10 +60,11 @@ public class KS3MultipartSampleSolution3 {
 		// 定义Object,并指向一个文件
 		String objectKey = "test.zip";
 		String filePath = "/tmp/" + objectKey;
+		String mimeType = "application/octet-stream";
 		File fileToUpload = new File(filePath);
 		
-		// 块上传
-		multipartUploadObejctByMultithreading(client, fileToUpload, bucketName, objectKey);
+		// 分块上传
+		multipartUploadObejctByMultithreading(client, fileToUpload, bucketName, objectKey,mimeType);
 		
 		// 删除Object
 		client.deleteObject(bucketName, objectKey);
@@ -74,7 +75,7 @@ public class KS3MultipartSampleSolution3 {
 	}
 
 	public static void multipartUploadObejctByMultithreading(KS3Client client,
-			File file, String bucketName,String objectKey) throws Exception {
+			File file, String bucketName,String objectKey,String mimeType) throws Exception {
 
 		// 要上传到文件至少要一个Part的大小
 		if (file.length() < PART_SIZE)
@@ -91,7 +92,7 @@ public class KS3MultipartSampleSolution3 {
 		List<UploadPart> partList = Collections.synchronizedList(new ArrayList<UploadPart>());
 
 		// 初始化一个上传会话
-		InitiateMultipartUploadResult imur = client.initiateMultipartUpload(bucketName, objectKey);
+		InitiateMultipartUploadResult imur = client.initiateMultipartUpload(bucketName, objectKey,mimeType);
 		String uploadId = imur.getUploadId();		
 		
 		
