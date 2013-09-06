@@ -300,6 +300,25 @@ public class ObjectOperation extends KS3Operation {
 		return resultParse.getInitiateMultipartUploadResult(response.getBody());
 	}
 	
+	public InitiateMultipartUploadResult initiateMultipartUpload(String bucketName, String objectKey,String mimeType)
+			throws Exception {
+
+		CodeUtils.checkStringParams("bucketName", bucketName);
+		CodeUtils.checkStringParams("objectKey", objectKey);
+		
+		if(mimeType==null||mimeType.trim().equals(""))
+			mimeType = "application/octet-stream";
+
+		RequestBuilder requestBuilder = requestFactory.getBuilder();
+		Map<String,String> params = new HashMap<String,String>();
+		params.put("uploads", null);
+		Request request = requestBuilder.setMethod(HttpMethod.POST).setBucket(bucketName).setObjectKey(objectKey)
+				.addHeader("content-type", mimeType).addPamams(params).build();
+		Response response = sendMessageAndKeepAlive(request);
+		
+		return resultParse.getInitiateMultipartUploadResult(response.getBody());
+	}
+	
 	public UploadPartResult uploadPart(UploadPartOptions uploadPartOptions) throws Exception{
 		
 		String bucketName = uploadPartOptions.getBucketName();

@@ -65,6 +65,7 @@ public class KS3MultipartSampleSolution2 {
 		// 定义Object,并指向一个文件，进而生成一个“流”
 		String objectKey = "test.zip";
 		String filePath = "/tmp/" + objectKey;
+		String mimeType = "application/octet-stream";
 		File fileToUpload = new File(filePath);
 		
 		//得到一个“流”
@@ -73,8 +74,8 @@ public class KS3MultipartSampleSolution2 {
 		//偏移量
 		int offset = 0;
 		
-		// 块上传
-		multipartUploadObejctByMultithreading(client, inputstream, offset,bucketName, objectKey);
+		// 分块上传
+		multipartUploadObejctByMultithreading(client, inputstream, offset,bucketName, objectKey,mimeType);
 		
 		// 删除Object
 		client.deleteObject(bucketName, objectKey);
@@ -85,7 +86,7 @@ public class KS3MultipartSampleSolution2 {
 	}
 
 	public static void multipartUploadObejctByMultithreading(KS3Client client,InputStream inputstream, 
-			int offset,String bucketName,String objectKey) throws Exception{
+			int offset,String bucketName,String objectKey,String mimeType) throws Exception{
 		
 		// 偏移量不能为负数
 		if (offset < 0)
@@ -104,7 +105,7 @@ public class KS3MultipartSampleSolution2 {
 		List<UploadPart> partList = Collections.synchronizedList(new ArrayList<UploadPart>());
 
 		// 初始化一个上传会话
-		InitiateMultipartUploadResult imur = client.initiateMultipartUpload(bucketName, objectKey);
+		InitiateMultipartUploadResult imur = client.initiateMultipartUpload(bucketName, objectKey,mimeType);
 		String uploadId = imur.getUploadId();	
 		
 		AbortMultipartUploadOptions abortMultipartUploadOptions = new AbortMultipartUploadOptions(bucketName, objectKey, uploadId);

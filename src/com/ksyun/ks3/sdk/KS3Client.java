@@ -258,6 +258,19 @@ public class KS3Client {
 	}
 	
 	/**
+	 * Initiate a multipart upload session.
+	 * @param bucketName Bucket name.
+	 * @param objectKey The key of a object.
+	 * @param mimeType The mime type of the object.
+	 * @return InitiateMultipartUploadResult instance.
+	 * @throws Exception
+	 */
+	public InitiateMultipartUploadResult initiateMultipartUpload(String bucketName, String objectKey,String mimeType)
+			throws Exception{
+		return objectOperation.initiateMultipartUpload(bucketName, objectKey, mimeType);
+	}
+	
+	/**
 	 * Upload a part of the object by options.
 	 * @param uploadPartOptions UploadPartOptions instance.
 	 * @return UploadPartResult instance.
