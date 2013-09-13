@@ -292,7 +292,7 @@ public class ResultParse {
 				String eTag = node.getElementsByTagName("ETag").item(0).getTextContent();
 				String key = node.getElementsByTagName("Key").item(0).getTextContent();
 				String sSize = node.getElementsByTagName("Size").item(0).getTextContent();
-				int size = Integer.valueOf(sSize);
+				Long size = Long.valueOf(sSize);
 				
 				Element ownerNode = (Element)node.getElementsByTagName("Owner").item(0);
 				String displayName = ownerNode.getElementsByTagName("DisplayName").item(0).getTextContent();
