@@ -20,7 +20,7 @@ public class ObjectInfo implements Serializable{
 	private Date lastModified;
 	private String eTag;
 	private String key;
-	private Integer size;	
+	private Long size;	
 	
 	/**
 	 * Construct an ObjectInfo instance by specified parameters.
@@ -32,7 +32,7 @@ public class ObjectInfo implements Serializable{
 	 * @param size The object size.
 	 */
 	public ObjectInfo(String ownerDisplayName, String ownerID,
-			Date lastModified, String eTag, String key, Integer size) {	
+			Date lastModified, String eTag, String key, Long size) {	
 		this.ownerDisplayName = ownerDisplayName;
 		this.ownerID = ownerID;
 		this.lastModified = lastModified;
@@ -125,7 +125,7 @@ public class ObjectInfo implements Serializable{
 	 * Get the object size.
 	 * @return The object size.
 	 */
-	public Integer getSize() {
+	public Long getSize() {
 		return size;
 	}
 	
@@ -133,7 +133,7 @@ public class ObjectInfo implements Serializable{
 	 * Set the object size.
 	 * @param size The object size.
 	 */
-	public void setSize(Integer size) {
+	public void setSize(Long size) {
 		this.size = size;
 	}
 	
