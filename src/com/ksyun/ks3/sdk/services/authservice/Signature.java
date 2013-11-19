@@ -37,7 +37,10 @@ public class Signature {
 		singleParameter.add("acl");
 		singleParameter.add("uploads");
 		singleParameter.add("partNumber");
-		singleParameter.add("uploadId");
+		singleParameter.add("uploadId");		
+		singleParameter.add("thumbnail");
+		singleParameter.add("width");
+		singleParameter.add("height");
 	}
 	
 	private static String base64encoding(byte[] b){		
@@ -112,9 +115,6 @@ public class Signature {
 				resUrl=resUrl+object;
 		}	
 		
-//		if(request.getUrl().endsWith("?acl"))
-//			resUrl+="?acl";
-		
 		Map<String, String> params = request.getParams();
 		Map<String, String> interestedParams = new TreeMap<String, String>();
 		if(params!=null&&params.size()>0){
@@ -124,7 +124,7 @@ public class Signature {
 				if(responseHeaders.contains(lowerKey))
 					interestedParams.put(lowerKey, entry.getValue());	
 				if(singleParameter.contains(entry.getKey()))
-					interestedParams.put(key, entry.getValue());	
+					interestedParams.put(key, entry.getValue());
 			}
 			
 			String paramsStr = "";
@@ -153,7 +153,7 @@ public class Signature {
 		}
 		strToSign=strToSign.substring(0, strToSign.length()-1);
 		
-//		System.out.println(strToSign);
+		//System.out.println(strToSign);
 			
 		String signedStr = sign(request.getCredential().getAccessKeySecret(),strToSign);
 		return signedStr;
