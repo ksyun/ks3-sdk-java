@@ -1,7 +1,11 @@
-*.class
-
-# Package Files #
-*.jar
-*.war
-*.ear
-/bin
+.gitignore
+.idea
+*.iml
+.classpath
+.project
+.settings/
+target/
+junit-report/
+dependency-reduced-pom.xml
+gen-java/
+out/
